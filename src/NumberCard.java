@@ -1,9 +1,7 @@
 public class NumberCard extends Card {
-    public NumberCard(String color, String type, int number) {
-        super(color, type, number);
+    public NumberCard(String color, String type, String typeDetail) {
+        super(color, type, typeDetail);
     }
-    @Override
-    public boolean playCard() {
-        return false;
-    }
+
+
 }

@@ -1,10 +1,10 @@
 public class ActionCard extends Card {
-    public ActionCard(String color, String type, int number) {
-        super(color, type, number);
+    // -1 means skip -2 means reverse -3 means draw
+
+    public ActionCard(String color, String type, String typeDetail) {
+        super(color, type, typeDetail);
     }
-    @Override
-    public boolean playCard() {
-        return false;
-    }
+
+
     // IF USING DRAW 2 THE NEXT PLAYER TURN WILL BE FORFIET
 }

@@ -1,15 +1,13 @@
 abstract public class Card {
     private String color;
     private String type;
-    private int number;
+    private String typeDetail;
 
-    public Card(String color, String type, int number) {
+    public Card(String color, String type, String typeDetail) {
         this.color = color;
         this.type = type;
-        this.number = number;
+        this.typeDetail = typeDetail;
     }
-
-    abstract public boolean playCard();
 
     public String getColor() {
         return color;
@@ -27,11 +25,11 @@ abstract public class Card {
         this.type = type;
     }
 
-    public int getNumber() {
-        return number;
+    public String getTypeDetail() {
+        return typeDetail;
     }
 
-    public void setNumber(int number) {
-        this.number = number;
+    public void setTypeDetail(String typeDetail) {
+        this.typeDetail = typeDetail;
     }
 }
