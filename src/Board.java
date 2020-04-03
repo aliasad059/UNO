@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Board {
-    static private ArrayList<ArrayList<Card>> cards = new ArrayList<>();
+    static private ArrayList<ArrayList<Card>> cards = new ArrayList<ArrayList<Card>>();
     static private int[] turns;
     static private Random random = new Random();
 
@@ -15,14 +15,27 @@ public class Board {
     public Board(int playersNumber) {
         this.playersNumber = playersNumber;
         turns = new int[playersNumber];
-        for (int i = 0; i < playersNumber; i++) {
-            turns[i] = i + 1;
+
+        // initializing turns array randomly with different amounts
+        int size = playersNumber;
+        ArrayList<Integer> list = new ArrayList<Integer>(size);
+        for (int i = 1; i <= size; i++) {
+            list.add(i);
         }
-        //all players deck + the remaining cards
+        for (int i = 0; i < turns.length; i++) {
+            int index = random.nextInt(list.size());
+            turns[i] = list.get(index);
+            list.remove(index);
+        }
+
+        //all players deck + the remaining cards on the ground
         for (int i = 0; i < playersNumber + 1; i++)
-            cards.add(new ArrayList<>());
+            cards.add(new ArrayList<Card>());
         makeCards();
+        System.out.println("cards in the ground number is " + cards.get(0).size());
         distributeCards();
+        System.out.println("YES");
+
     }
 
     private void makeCards() {
@@ -33,16 +46,16 @@ public class Board {
                     Integer integer = j + 1;
                     cards.get(0).add(new NumberCard(Constants.colors[i], Constants.types[0], integer.toString()));
                 }
-                cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[0]));
-                cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[1]));
-                cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[2]));
-                cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[0]));
-                cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[1]));
-                cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[2]));
-
-                cards.get(0).add(new WildCard(Constants.colors[4], Constants.types[2], Constants.typesDetail[3]));
-                cards.get(0).add(new WildCard(Constants.colors[4], Constants.types[2], Constants.typesDetail[4]));
             }
+            cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[0]));
+            cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[1]));
+            cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[2]));
+            cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[0]));
+            cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[1]));
+            cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[2]));
+
+            cards.get(0).add(new WildCard(Constants.colors[4], Constants.types[2], Constants.typesDetail[3]));
+            cards.get(0).add(new WildCard(Constants.colors[4], Constants.types[2], Constants.typesDetail[4]));
         }
     }
 
@@ -60,15 +73,19 @@ public class Board {
             if (cards.get(0).get(randomCardNumber).getType().equals(Constants.types[0])) {
                 setLastPlayedCard(cards.get(0).get(randomCardNumber));
                 setCurrentColor(lastPlayedCard.getColor());
+                break;
             } else if (cards.get(0).get(randomCardNumber).getType().equals(Constants.types[1])) {
                 if (cards.get(0).get(randomCardNumber).getTypeDetail().equals(Constants.typesDetail[0])) {
+                    Player.isSkipped = true;
                 } else if (cards.get(0).get(randomCardNumber).getTypeDetail().equals(Constants.typesDetail[1])) {
                     reverse(turns[0]);
                 } else if (cards.get(0).get(randomCardNumber).getTypeDetail().equals(Constants.typesDetail[2])) {
                     Player.setAddCardNumber(2);
+                    Player.isSkipped = true;
                 }
                 setLastPlayedCard(cards.get(0).get(randomCardNumber));
                 setCurrentColor(lastPlayedCard.getColor());
+                break;
             } else continue;
         }
     }
@@ -101,17 +118,25 @@ public class Board {
         return turns;
     }
 
-    // input of following methods are maybe different
+    //give an example in the comment
     public static void reverse(int turnIDOfCurrentPlayer) {
-        int playerIndex;
+        int playerIndex = 0;
         for (int i = 0; i < turns.length; i++) {
             if (turns[i] == turnIDOfCurrentPlayer) {
                 playerIndex = i;
+                System.out.println("playerIndex = "+i);
+                System.out.println("turnIDOfCurrentPlayer = "+turnIDOfCurrentPlayer);
                 break;
             }
         }
+        int[] temp = new int[turns.length];
         for (int i = 0; i < turns.length; i++) {
-
+            temp[i] = turns[(playerIndex - i + turns.length -1) % turns.length];
+            System.out.println(turns[i]);
+        }
+        for (int i = 0; i < turns.length; i++) {
+            turns[i] = temp[(playerIndex + i + turns.length -1) % turns.length];
+            System.out.println(turns[i]);
         }
         wise *= -1;
     }
@@ -119,7 +144,7 @@ public class Board {
     public static void addCardToDeck(int turnIDOfCurrentPlayer, int cardsNumber) {
         for (int i = 0; i < cardsNumber; i++) {
             int cardToAddIndex = random.nextInt(cards.get(0).size());
-            Card cardToAdd = cards.get(turnIDOfCurrentPlayer).get(cardToAddIndex);
+            Card cardToAdd = cards.get(0).get(cardToAddIndex);
             cards.get(turnIDOfCurrentPlayer).add(cardToAdd);
             cards.get(0).remove(cardToAdd);
         }
@@ -137,19 +162,25 @@ public class Board {
             ANSI_COLOR = Constants.ANSI_COLORS[3];
         else ANSI_COLOR = "0";
 
-        System.out.print(ANSI_COLOR + "------------------  ");
-        System.out.print("+                +  ");
-        System.out.print("|LAST PLAYED CARD|  ");
-        System.out.print("+                +  ");
-        System.out.print("------------------  ");
-        System.out.print("+                +  ");
-        System.out.print("|                |  ");
-        System.out.print("+                +  ");
-        System.out.print("|    " + lastPlayedCard.getTypeDetail() + "    |  ");
-        System.out.print("+                +  ");
-        System.out.print("|                |  ");
-        System.out.print("+                +  ");
-        System.out.print("------------------  " + ANSI_COLOR);
+        System.out.println(ANSI_COLOR + "------------------  ");
+        System.out.println("+                +  ");
+        System.out.println("|LAST PLAYED CARD|  ");
+        System.out.println("+                +  ");
+        System.out.println("------------------  ");
+        System.out.println("+                +  ");
+        System.out.println("|                |  ");
+        System.out.println("+                +  ");
+        System.out.println("|    " + lastPlayedCard.getTypeDetail() + "   |  ");
+        System.out.println("+                +  ");
+        System.out.println("|                |  ");
+        System.out.println("+                +  ");
+        System.out.println("------------------  " + ANSI_COLOR);
         System.out.println("\n");
+    }
+
+    public static String getWise() {
+        if (wise > 0)
+            return "ClockWise";
+        else return "Anti ClockWise";
     }
 }

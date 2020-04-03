@@ -3,10 +3,12 @@ import java.util.Random;
 import java.util.Scanner;
 
 abstract public class Player {
-    String PlayerName;
-    int turnID;
-    static int addCardNumber = 0;
-    ArrayList<Card> playerCard;
+    protected String PlayerName;
+    protected int turnID;
+    protected static int addCardNumber = 0;
+    protected ArrayList<Card> playerCard;
+    protected int point;
+    static boolean isSkipped = false;
     Scanner scanner = new Scanner(System.in);
     Random random = new Random();
 
@@ -65,10 +67,20 @@ abstract public class Player {
     public void dropCard(Card cardToDrop) {
         Board.getCards().get(0).add(cardToDrop);
         Board.getCards().get(this.turnID).remove(cardToDrop);
+        System.out.println(this.PlayerName + " drop the "+cardToDrop.getType()+" card with kind of "+cardToDrop.getTypeDetail());
 
     }
 
     public static void setAddCardNumber(int addCardNumber) {
         Player.addCardNumber = addCardNumber;
     }
+
+    public ArrayList<Card> getPlayerCard() {
+        return playerCard;
+    }
+
+    public int getTurnID() {
+        return turnID;
+    }
+
 }

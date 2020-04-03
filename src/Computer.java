@@ -10,10 +10,12 @@ public class Computer extends Player {
 
     @Override
     public void chooseCard() {
-        if (Board.getLastPlayedCard().getTypeDetail().equals(Constants.typesDetail[0])) {
+        System.out.println(super.addCardNumber);
+        if (isSkipped && Board.getLastPlayedCard().getTypeDetail().equals(Constants.typesDetail[0])) {
+            isSkipped = false;
             System.out.println(this.PlayerName + " is skipped!");
             return;
-        } else if (addCardNumber != 0) {
+        } else if (super.addCardNumber != 0) {
             ArrayList<Card> drawCards = new ArrayList<Card>();
             for (Card card : Board.getCards().get(this.turnID)) {
                 if (card.getTypeDetail().equals(Constants.typesDetail[4]) || card.getTypeDetail().equals(Constants.typesDetail[2])) {
@@ -24,12 +26,12 @@ public class Computer extends Player {
             if (drawCards.size() != 0) {
                 int cardToChooseNumber = random.nextInt(drawCards.size());
                 playCard(drawCards.get(cardToChooseNumber));
-                return;
             } else {
-                Board.addCardToDeck(this.turnID, addCardNumber);
-                addCardNumber = 0;
-                return;
+                Board.addCardToDeck(this.turnID, super.addCardNumber);
+                System.out.println(super.addCardNumber + " cards are added to "+this.PlayerName+"'s deck");
+                super.addCardNumber = 0;
             }
+            return;
 
         }
 
@@ -73,17 +75,22 @@ public class Computer extends Player {
 
             //if the card is a wild draw card
             if (cardToPlay.getTypeDetail().equals(Constants.typesDetail[4])) {
-                addCardNumber += 4;
+                super.addCardNumber += 4;
+                isSkipped = true;
                 //if it is a choose color wild card
             }
             //after using any wild card we must set a new color to the board
-            Board.setCurrentColor(bestColorToChoose());
+            String bestColor = bestColorToChoose();
+            System.out.println(this.PlayerName + " changed board color to " + bestColor);
+            Board.setCurrentColor(bestColor);
+            isSkipped = true;
         }
         // if the card is an action card
         else if (cardToPlay.getType().equals(Constants.types[1])) {
             //playing skip card
             if (cardToPlay.getTypeDetail().equals(Constants.typesDetail[0])) {
                 Board.setCurrentColor(cardToPlay.getColor());
+                isSkipped = true;
             }
             //playing reverse card
             else if (cardToPlay.getTypeDetail().equals(Constants.typesDetail[1])) {
@@ -94,7 +101,8 @@ public class Computer extends Player {
             else if (cardToPlay.getTypeDetail().equals(Constants.typesDetail[2])) {
 
                 Board.setCurrentColor(cardToPlay.getColor());
-                addCardNumber += 2;
+                super.addCardNumber += 2;
+                isSkipped = true;
             }
         }
         //if the card is an number card

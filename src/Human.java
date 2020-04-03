@@ -8,10 +8,13 @@ public class Human extends Player {
 
     @Override
     public void chooseCard() {
-        if (Board.getLastPlayedCard().getTypeDetail().equals(Constants.typesDetail[0])) {
+        System.out.println(super.addCardNumber);
+
+        if (isSkipped && Board.getLastPlayedCard().getTypeDetail().equals(Constants.typesDetail[0])) {
+            isSkipped = false;
             System.out.println(this.PlayerName + " is skipped!");
             return;
-        } else if (addCardNumber != 0) {
+        } else if (super.addCardNumber != 0) {
             ArrayList<Card> drawCards = new ArrayList<Card>();
             for (Card card : Board.getCards().get(this.turnID)) {
                 if (card.getTypeDetail().equals(Constants.typesDetail[4]) || card.getTypeDetail().equals(Constants.typesDetail[2])) {
@@ -20,10 +23,16 @@ public class Human extends Player {
                 }
             }
             if (drawCards.size() != 0) {
-                System.out.println("Will you play your draw cards of take " + addCardNumber + " cards?");
+                System.out.println("Will you play your draw cards OR take " + super.addCardNumber + " cards?");
                 while (true) {
                     System.out.println("Enter Y (yes) to choose your draw and N (no) to take cards from storage");
-                    char choice = scanner.nextLine().toUpperCase().charAt(0);
+                    char choice;
+                    try {
+                        choice = scanner.nextLine().toUpperCase().charAt(0);
+                    }
+                    catch (StringIndexOutOfBoundsException e){
+                        continue;
+                    }
                     if (choice == 'Y') {
                         while (true) {
                             System.out.println("Choose a card");
@@ -35,8 +44,8 @@ public class Human extends Player {
                             } else System.out.println("Wrong input enter try again");
                         }
                     } else if (choice == 'N') {
-                        Board.addCardToDeck(this.turnID, addCardNumber);
-                        addCardNumber = 0;
+                        Board.addCardToDeck(this.turnID, super.addCardNumber);
+                        super.addCardNumber = 0;
                         return;
                     } else {
                         System.out.println("Wrong input enter try again");
@@ -44,8 +53,8 @@ public class Human extends Player {
                     }
                 }
             } else {
-                Board.addCardToDeck(this.turnID, addCardNumber);
-                addCardNumber = 0;
+                Board.addCardToDeck(this.turnID, super.addCardNumber);
+                super.addCardNumber = 0;
                 return;
             }
 
@@ -61,7 +70,7 @@ public class Human extends Player {
             // normal situation
             Card cardToPlay;
             while (true) {
-
+                printDeck(this.playerCard);
                 System.out.println(this.PlayerName + " enter a card");
                 int cardToPlayNumber = scanner.nextInt();
                 if (canUseThisCard(playerCard.get(cardToPlayNumber))) {
@@ -92,8 +101,8 @@ public class Human extends Player {
 
             //if the card is a wild draw card
             if (cardToPlay.getTypeDetail().equals(Constants.typesDetail[4])) {
-                addCardNumber += 4;
-
+                super.addCardNumber += 4;
+                isSkipped = true;
             }
             //after using any wild card we must set a new color to the board
             while (true) {
@@ -119,6 +128,7 @@ public class Human extends Player {
             //playing skip card
             if (cardToPlay.getTypeDetail().equals(Constants.typesDetail[0])) {
                 Board.setCurrentColor(cardToPlay.getColor());
+                isSkipped = true;
             }
             //playing reverse card
             else if (cardToPlay.getTypeDetail().equals(Constants.typesDetail[1])) {
@@ -129,7 +139,8 @@ public class Human extends Player {
             else if (cardToPlay.getTypeDetail().equals(Constants.typesDetail[2])) {
 
                 Board.setCurrentColor(cardToPlay.getColor());
-                addCardNumber += 2;
+                super.addCardNumber += 2;
+                isSkipped = true;
             }
         }
         //if the card is an number card
@@ -149,27 +160,51 @@ public class Human extends Player {
 
             System.out.print(getANSICOLOR(deckToPrint.get(j)) + "------------------  " + getANSICOLOR(deckToPrint.get(j)));
         }
-        System.out.print("\u001B[30m" + "+                +  " + "\u001B[30m");
+        System.out.println();
+        for (int j = 0; j < deckToPrint.size(); j++) {
+            System.out.print("\u001B[30m" + "+                +  " + "\u001B[30m");
+        }
+        System.out.println();
         for (int j = 0; j < deckToPrint.size(); j++) {
             System.out.print(getANSICOLOR(deckToPrint.get(j)) + "|     Card  " + (j) + "    |  " + getANSICOLOR(deckToPrint.get(j)));
         }
-        System.out.print("\u001B[30m" + "+                +  " + "\u001B[30m");
+        System.out.println();
+        for (int j = 0; j < deckToPrint.size(); j++) {
+            System.out.print("\u001B[30m" + "+                +  " + "\u001B[30m");
+        }
+        System.out.println();
         for (int j = 0; j < deckToPrint.size(); j++) {
             System.out.print(getANSICOLOR(deckToPrint.get(j)) + "------------------  " + getANSICOLOR(deckToPrint.get(j)));
         }
-        System.out.print("\u001B[30m" + "+                +  " + "\u001B[30m");
+        System.out.println();
+        for (int j = 0; j < deckToPrint.size(); j++) {
+            System.out.print("\u001B[30m" + "+                +  " + "\u001B[30m");
+        }
+        System.out.println();
         for (int j = 0; j < deckToPrint.size(); j++) {
             System.out.print(getANSICOLOR(deckToPrint.get(j)) + "|                |  " + getANSICOLOR(deckToPrint.get(j)));
         }
-        System.out.print("\u001B[30m" + "+                +  " + "\u001B[30m");
+        System.out.println();
+        for (int j = 0; j < deckToPrint.size(); j++) {
+            System.out.print(getANSICOLOR(deckToPrint.get(j)) + "+                +  " + getANSICOLOR(deckToPrint.get(j)));
+        }
+        System.out.println();
         for (int j = 0; j < deckToPrint.size(); j++) {
             System.out.print(getANSICOLOR(deckToPrint.get(j)) + "|   " + deckToPrint.get(j).getTypeDetail() + "    |  ");
         }
-        System.out.print("\u001B[30m" + "+                +  " + "\u001B[30m");
+        System.out.println();
+        for (int j = 0; j < deckToPrint.size(); j++) {
+            System.out.print(getANSICOLOR(deckToPrint.get(j)) + "+                +  " + getANSICOLOR(deckToPrint.get(j)));
+        }
+        System.out.println();
         for (int j = 0; j < deckToPrint.size(); j++) {
             System.out.print(getANSICOLOR(deckToPrint.get(j)) + "|                |  " + getANSICOLOR(deckToPrint.get(j)));
         }
-        System.out.print("\u001B[30m" + "+                +  " + "\u001B[30m");
+        System.out.println();
+        for (int j = 0; j < deckToPrint.size(); j++) {
+            System.out.print(getANSICOLOR(deckToPrint.get(j)) + "+                +  " + getANSICOLOR(deckToPrint.get(j)));
+        }
+        System.out.println();
         for (int j = 0; j < deckToPrint.size(); j++) {
             System.out.print(getANSICOLOR(deckToPrint.get(j)) + "------------------  " + getANSICOLOR(deckToPrint.get(j)));
         }
