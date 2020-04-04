@@ -32,19 +32,15 @@ public class Board {
         for (int i = 0; i < playersNumber + 1; i++)
             cards.add(new ArrayList<Card>());
         makeCards();
-        System.out.println("cards in the ground number is " + cards.get(0).size());
         distributeCards();
-        System.out.println("YES");
-
     }
 
     private void makeCards() {
         for (int i = 0; i < 4; i++) {
-            for (Integer j = 0; j < 10; j++) {
-                cards.get(0).add(new NumberCard(Constants.colors[i], Constants.types[0], j.toString()));
+            for (int j = 0; j < 10; j++) {
+                cards.get(0).add(new NumberCard(Constants.colors[i], Constants.types[0], "    " + j + "    "));
                 if (j + 1 < 10) {
-                    Integer integer = j + 1;
-                    cards.get(0).add(new NumberCard(Constants.colors[i], Constants.types[0], integer.toString()));
+                    cards.get(0).add(new NumberCard(Constants.colors[i], Constants.types[0], "    " + (j + 1) + "    "));
                 }
             }
             cards.get(0).add(new ActionCard(Constants.colors[i], Constants.types[1], Constants.typesDetail[0]));
@@ -120,24 +116,32 @@ public class Board {
 
     //give an example in the comment
     public static void reverse(int turnIDOfCurrentPlayer) {
-        int playerIndex = 0;
-        for (int i = 0; i < turns.length; i++) {
-            if (turns[i] == turnIDOfCurrentPlayer) {
-                playerIndex = i;
-                System.out.println("playerIndex = "+i);
-                System.out.println("turnIDOfCurrentPlayer = "+turnIDOfCurrentPlayer);
-                break;
+        if (turns.length == 2) {
+            int temp = turns[0];
+            turns[0] = turns[1];
+            turns[1] = temp;
+        } else {
+            int playerIndex = 0;
+            for (int i = 0; i < turns.length; i++) {
+                if (turns[i] == turnIDOfCurrentPlayer) {
+                    playerIndex = i;
+                    System.out.println("playerIndex = " + i);
+                    System.out.println("turnIDOfCurrentPlayer = " + turnIDOfCurrentPlayer);
+                    break;
+                }
+            }
+            int[] temp = new int[turns.length];
+            for (int i = 0; i < turns.length; i++) {
+                temp[i] = turns[(playerIndex - i + turns.length) % turns.length];
+                System.out.println(turns[i]);
+            }
+            for (int i = 0; i < turns.length; i++) {
+                //turns[i] = temp[(playerIndex + i + turns.length -1) % turns.length];
+                turns[(i + playerIndex) % turns.length] = temp[i];
+                System.out.println(turns[i]);
             }
         }
-        int[] temp = new int[turns.length];
-        for (int i = 0; i < turns.length; i++) {
-            temp[i] = turns[(playerIndex - i + turns.length -1) % turns.length];
-            System.out.println(turns[i]);
-        }
-        for (int i = 0; i < turns.length; i++) {
-            turns[i] = temp[(playerIndex + i + turns.length -1) % turns.length];
-            System.out.println(turns[i]);
-        }
+        System.out.println("The board is reversed!");
         wise *= -1;
     }
 
@@ -175,7 +179,7 @@ public class Board {
         System.out.println("|                |  ");
         System.out.println("+                +  ");
         System.out.println("------------------  " + ANSI_COLOR);
-        System.out.println("\n");
+        System.out.println("\n" + "\u001B[0m");
     }
 
     public static String getWise() {

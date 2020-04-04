@@ -8,7 +8,7 @@ abstract public class Card {
         this.type = type;
         this.typeDetail = typeDetail;
         if (type.equals(Constants.types[0]))
-            point = (int)typeDetail.charAt(0)-48;
+            point = (int)typeDetail.charAt(4)-48;
         else if(type.equals(Constants.types[1]))
             point = 20;
         else point = 50;

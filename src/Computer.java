@@ -10,12 +10,11 @@ public class Computer extends Player {
 
     @Override
     public void chooseCard() {
-        System.out.println(super.addCardNumber);
         if (isSkipped && Board.getLastPlayedCard().getTypeDetail().equals(Constants.typesDetail[0])) {
             isSkipped = false;
             System.out.println(this.PlayerName + " is skipped!");
             return;
-        } else if (super.addCardNumber != 0) {
+        } else if (addCardNumber != 0) {
             ArrayList<Card> drawCards = new ArrayList<Card>();
             for (Card card : Board.getCards().get(this.turnID)) {
                 if (card.getTypeDetail().equals(Constants.typesDetail[4]) || card.getTypeDetail().equals(Constants.typesDetail[2])) {
@@ -27,9 +26,9 @@ public class Computer extends Player {
                 int cardToChooseNumber = random.nextInt(drawCards.size());
                 playCard(drawCards.get(cardToChooseNumber));
             } else {
-                Board.addCardToDeck(this.turnID, super.addCardNumber);
-                System.out.println(super.addCardNumber + " cards are added to "+this.PlayerName+"'s deck");
-                super.addCardNumber = 0;
+                Board.addCardToDeck(this.turnID, addCardNumber);
+                System.out.println(addCardNumber + " cards are added to "+this.PlayerName+"'s deck");
+                addCardNumber = 0;
             }
             return;
 
@@ -56,12 +55,13 @@ public class Computer extends Player {
                 }
             }
         } else {
-            System.out.println(this.PlayerName + " can not play any card, 1 card is added to the deck");
+            System.out.println(this.PlayerName + " can not play any card, 1 card is added to " +this.getPlayerName()+"'s deck");
             Board.addCardToDeck(this.turnID, 1);
             //checking maybe can play new added card
             for (Card card : Board.getCards().get(turnID)) {
                 if (canUseThisCard(card)) {
-                    playCard(card);
+                    System.out.println(this.PlayerName+" found a card to play from the ground!");
+                    this.chooseCard();
                     return;
                 }
             }
@@ -75,7 +75,7 @@ public class Computer extends Player {
 
             //if the card is a wild draw card
             if (cardToPlay.getTypeDetail().equals(Constants.typesDetail[4])) {
-                super.addCardNumber += 4;
+                addCardNumber += 4;
                 isSkipped = true;
                 //if it is a choose color wild card
             }
@@ -101,7 +101,7 @@ public class Computer extends Player {
             else if (cardToPlay.getTypeDetail().equals(Constants.typesDetail[2])) {
 
                 Board.setCurrentColor(cardToPlay.getColor());
-                super.addCardNumber += 2;
+                addCardNumber += 2;
                 isSkipped = true;
             }
         }

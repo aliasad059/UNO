@@ -30,8 +30,17 @@ public class Game {
         System.out.println("Welcome to UNO solo mode!");
         System.out.println("Enter your name");
         String humanName = scanner.nextLine();
-        System.out.println("Enter number of players");
-        int playersNumber = scanner.nextLine().charAt(0)-48;
+        int playersNumber;
+        while (true) {
+            System.out.println("Enter number of players");
+            playersNumber = scanner.nextInt();
+            scanner.nextLine();
+            if (playersNumber < 2) {
+                System.out.println("The game must have at least two players, enter another number");
+                continue;
+            }
+            break;
+        }
         Board board = new Board(playersNumber);
         // if player turnID changes , no problem will happen , but it had to be a number between 1 to playersNumber
         // in other word when a player's turn Id is 1 it does not mean he is the first player to start
@@ -47,12 +56,12 @@ public class Game {
 
                 for (int j = 0; j < turns.length; j++) {
                     Player playerToPrint = whosTurn(turns, j, players);
-                    System.out.println(playerToPrint.PlayerName + " has " + playerToPrint.playerCard.size() + " cards");
+                    System.out.println((j+1)+". "+playerToPrint.PlayerName + " has " + playerToPrint.playerCard.size() + " cards");
                 }
                 //sleeping for 5 seconds to see what the bots are doing
                 board.printLastPlayedCard();
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     System.out.println();
                 }
@@ -71,8 +80,17 @@ public class Game {
     public static void startMultiMode() {
         ArrayList<Player> players = new ArrayList<Player>();
         System.out.println("Welcome to UNO multi mode!");
-        System.out.println("Enter number of players");
-        int playersNumber = scanner.nextInt();
+        int playersNumber;
+        while (true) {
+            System.out.println("Enter number of players");
+            playersNumber = scanner.nextInt();
+            scanner.nextLine();
+            if (playersNumber < 2) {
+                System.out.println("The game must have at least two players, enter another number");
+                continue;
+            }
+            break;
+        }
         Board board = new Board(playersNumber);
         // if player turnID changes , no problem will happen , but it had to be a number between 1 to playersNumber
         // in other word when a player's turn Id is 1 it does not mean he is the first player to start
@@ -81,14 +99,15 @@ public class Game {
             String humanName = scanner.nextLine();
             players.add(new Human(humanName, i));
         }
-        int[] turns = Board.getTurns();
         while (true) {
+            int[] turns = Board.getTurns();
             for (int i = 0; i < turns.length; i++) {
                 System.out.println("The game wise is : " + Board.getWise());
                 for (int j = 0; j < turns.length; j++) {
                     Player playerToPrint = whosTurn(turns, j, players);
-                    System.out.println(playerToPrint.PlayerName + " has " + playerToPrint.playerCard.size() + " cards");
+                    System.out.println((j+1)+". "+playerToPrint.PlayerName + " has " + playerToPrint.playerCard.size() + " cards");
                 }
+                board.printLastPlayedCard();
                 Player playerToPlay = whosTurn(turns, i, players);
                 playerToPlay.chooseCard();
                 if (playerToPlay.playerCard.size() == 0) {
@@ -102,6 +121,20 @@ public class Game {
     }
 
     public static void main(String[] args) {
-        startSoloMode();
+        System.out.println("Welcome to the UNO game!");
+        System.out.println("This game is played in two modes , solo mode with bots and multi mode");
+        while (true) {
+            System.out.println("Which mode do you want to play? enter 1 to play SOLO and 2 to play MULTI");
+            int gameMode = scanner.nextInt();
+            scanner.nextLine();
+            if (gameMode == 1)
+                startSoloMode();
+            else if (gameMode == 2) startMultiMode();
+            else {
+                System.out.println("Wrong input, choose another");
+                continue;
+            }
+            break;
+        }
     }
 }

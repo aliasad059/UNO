@@ -53,7 +53,7 @@ abstract public class Player {
             else if ((cardToUse.getTypeDetail().equals(Constants.typesDetail[4]))) {
                 boolean canUseAnyOtherCard = false;
                 for (Card otherCard : Board.getCards().get(this.turnID)) {
-                    if (otherCard.getType().equals(Constants.types[0]) || otherCard.getType().equals(Constants.types[0])) {
+                    if (!otherCard.getTypeDetail().equals(Constants.typesDetail[4])) {
                         if (canUseThisCard(otherCard))
                             return false;
                     }
@@ -67,7 +67,7 @@ abstract public class Player {
     public void dropCard(Card cardToDrop) {
         Board.getCards().get(0).add(cardToDrop);
         Board.getCards().get(this.turnID).remove(cardToDrop);
-        System.out.println(this.PlayerName + " drop the "+cardToDrop.getType()+" card with kind of "+cardToDrop.getTypeDetail());
+        System.out.println(this.PlayerName + " drop the " + cardToDrop.getType() + " card with kind of " + cardToDrop.getTypeDetail());
 
     }
 

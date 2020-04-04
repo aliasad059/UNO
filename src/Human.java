@@ -8,13 +8,11 @@ public class Human extends Player {
 
     @Override
     public void chooseCard() {
-        System.out.println(super.addCardNumber);
-
         if (isSkipped && Board.getLastPlayedCard().getTypeDetail().equals(Constants.typesDetail[0])) {
             isSkipped = false;
             System.out.println(this.PlayerName + " is skipped!");
             return;
-        } else if (super.addCardNumber != 0) {
+        } else if (addCardNumber != 0) {
             ArrayList<Card> drawCards = new ArrayList<Card>();
             for (Card card : Board.getCards().get(this.turnID)) {
                 if (card.getTypeDetail().equals(Constants.typesDetail[4]) || card.getTypeDetail().equals(Constants.typesDetail[2])) {
@@ -23,9 +21,10 @@ public class Human extends Player {
                 }
             }
             if (drawCards.size() != 0) {
-                System.out.println("Will you play your draw cards OR take " + super.addCardNumber + " cards?");
+                System.out.println("Will you play your draw cards OR take " + addCardNumber + " cards?");
                 while (true) {
                     System.out.println("Enter Y (yes) to choose your draw and N (no) to take cards from storage");
+                    scanner.nextLine();
                     char choice;
                     try {
                         choice = scanner.nextLine().toUpperCase().charAt(0);
@@ -44,8 +43,8 @@ public class Human extends Player {
                             } else System.out.println("Wrong input enter try again");
                         }
                     } else if (choice == 'N') {
-                        Board.addCardToDeck(this.turnID, super.addCardNumber);
-                        super.addCardNumber = 0;
+                        Board.addCardToDeck(this.turnID, addCardNumber);
+                        addCardNumber = 0;
                         return;
                     } else {
                         System.out.println("Wrong input enter try again");
@@ -53,8 +52,9 @@ public class Human extends Player {
                     }
                 }
             } else {
-                Board.addCardToDeck(this.turnID, super.addCardNumber);
-                super.addCardNumber = 0;
+                System.out.println(addCardNumber + " cards are added to "+this.getPlayerName()+"'s deck");
+                Board.addCardToDeck(this.turnID, addCardNumber);
+                addCardNumber = 0;
                 return;
             }
 
@@ -71,23 +71,30 @@ public class Human extends Player {
             Card cardToPlay;
             while (true) {
                 printDeck(this.playerCard);
-                System.out.println(this.PlayerName + " enter a card");
+                System.out.println(this.PlayerName + " choose a card");
                 int cardToPlayNumber = scanner.nextInt();
-                if (canUseThisCard(playerCard.get(cardToPlayNumber))) {
-                    cardToPlay = playerCard.get(cardToPlayNumber);
-                    Board.setLastPlayedCard(cardToPlay);
-                    Board.setCurrentColor(cardToPlay.getColor());
-                    playCard(cardToPlay);
-                    break;
-                } else System.out.println("Can not play this card now , choose another.");
+                if (cardToPlayNumber <playerCard.size()) {
+                    if (canUseThisCard(playerCard.get(cardToPlayNumber))) {
+                        cardToPlay = playerCard.get(cardToPlayNumber);
+                        Board.setLastPlayedCard(cardToPlay);
+                        Board.setCurrentColor(cardToPlay.getColor());
+                        playCard(cardToPlay);
+                        break;
+                    } else System.out.println("Can not play this card now , choose another.");
+                }
+                else {
+                    System.out.println("You don't have such a this card , choose another");
+                    continue;
+                }
             }
         } else {
-            System.out.println(this.PlayerName + " can not play any card, 1 card is added to the deck");
+            System.out.println(this.PlayerName + " can not play any card, 1 card is added to " +this.getPlayerName()+"'s deck");
             Board.addCardToDeck(this.turnID, 1);
             //checking maybe can play new added card
             for (Card card : Board.getCards().get(turnID)) {
                 if (canUseThisCard(card)) {
-                    playCard(card);
+                    System.out.println(this.PlayerName+" found a card to play from the ground!");
+                    this.chooseCard();
                     return;
                 }
             }
@@ -101,7 +108,7 @@ public class Human extends Player {
 
             //if the card is a wild draw card
             if (cardToPlay.getTypeDetail().equals(Constants.typesDetail[4])) {
-                super.addCardNumber += 4;
+                addCardNumber += 4;
                 isSkipped = true;
             }
             //after using any wild card we must set a new color to the board
@@ -139,7 +146,7 @@ public class Human extends Player {
             else if (cardToPlay.getTypeDetail().equals(Constants.typesDetail[2])) {
 
                 Board.setCurrentColor(cardToPlay.getColor());
-                super.addCardNumber += 2;
+                addCardNumber += 2;
                 isSkipped = true;
             }
         }
@@ -155,14 +162,14 @@ public class Human extends Player {
     }
 
     public void printDeck(ArrayList<Card> deckToPrint) {
-        System.out.println("");
+        System.out.println("\u001B[0m");
         for (int j = 0; j < deckToPrint.size(); j++) {
 
             System.out.print(getANSICOLOR(deckToPrint.get(j)) + "------------------  " + getANSICOLOR(deckToPrint.get(j)));
         }
         System.out.println();
         for (int j = 0; j < deckToPrint.size(); j++) {
-            System.out.print("\u001B[30m" + "+                +  " + "\u001B[30m");
+            System.out.print(getANSICOLOR(deckToPrint.get(j))  +"+                +  " +getANSICOLOR(deckToPrint.get(j)));
         }
         System.out.println();
         for (int j = 0; j < deckToPrint.size(); j++) {
@@ -170,7 +177,7 @@ public class Human extends Player {
         }
         System.out.println();
         for (int j = 0; j < deckToPrint.size(); j++) {
-            System.out.print("\u001B[30m" + "+                +  " + "\u001B[30m");
+            System.out.print(getANSICOLOR(deckToPrint.get(j))+ "+                +  " +getANSICOLOR(deckToPrint.get(j)));
         }
         System.out.println();
         for (int j = 0; j < deckToPrint.size(); j++) {
@@ -178,7 +185,7 @@ public class Human extends Player {
         }
         System.out.println();
         for (int j = 0; j < deckToPrint.size(); j++) {
-            System.out.print("\u001B[30m" + "+                +  " + "\u001B[30m");
+            System.out.print(getANSICOLOR(deckToPrint.get(j)) + "+                +  " + getANSICOLOR(deckToPrint.get(j)));
         }
         System.out.println();
         for (int j = 0; j < deckToPrint.size(); j++) {
@@ -208,7 +215,7 @@ public class Human extends Player {
         for (int j = 0; j < deckToPrint.size(); j++) {
             System.out.print(getANSICOLOR(deckToPrint.get(j)) + "------------------  " + getANSICOLOR(deckToPrint.get(j)));
         }
-        System.out.println("\n");
+        System.out.println("\n"+"\u001B[0m");
     }
 
     public static String getANSICOLOR(Card card) {
@@ -222,5 +229,17 @@ public class Human extends Player {
             return Constants.ANSI_COLORS[3];
         else
             return Constants.ANSI_COLORS[4];
+    }
+    public static String getANSICOLOR_BACKGROUND(Card card) {
+        if (card.getColor().equals(Constants.colors[0]))
+            return Constants.ANSI_COLORS_BACKGROUND[0];
+        else if (card.getColor().equals(Constants.colors[1]))
+            return Constants.ANSI_COLORS_BACKGROUND[1];
+        else if (card.getColor().equals(Constants.colors[2]))
+            return Constants.ANSI_COLORS_BACKGROUND[2];
+        else if (card.getColor().equals(Constants.colors[3]))
+            return Constants.ANSI_COLORS_BACKGROUND[3];
+        else
+            return Constants.ANSI_COLORS_BACKGROUND[4];
     }
 }
