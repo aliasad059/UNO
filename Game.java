@@ -11,12 +11,13 @@ public class Game {
      * the turns array tells us which player's turn is , we give the turn to the players by this array.
      * in this array the value of each index is the player turn ID which is unique to each player and explained in it's place
      * this method will get the turns array , an index of it , and returns the player with the right turnID
-     * @param turns turns array
+     *
+     * @param turns     turns array
      * @param turnIndex this index contains an turnID that is for a player
-     * @param players list of players
+     * @param players   list of players
      * @return the player that should play a card
      */
-    private static Player whosTurn(int[] turns, int turnIndex, ArrayList<Player> players) {
+    public static Player whosTurn(int[] turns, int turnIndex, ArrayList<Player> players) {
         for (int i = 0; i < players.size(); i++) {
             if (turns[turnIndex] == players.get(i).turnID)
                 return players.get(i);
@@ -26,6 +27,7 @@ public class Game {
 
     /**
      * print the ranking of the players when the game is finished according to their points using a Comparator
+     *
      * @param players players list
      */
     private static void printRanking(ArrayList<Player> players) {
@@ -48,37 +50,33 @@ public class Game {
     public static void startSoloMode() {
         ArrayList<Player> players = new ArrayList<Player>();
         System.out.println("Welcome to UNO solo mode!");
-        System.out.println("Enter your name");
-        String humanName = scanner.nextLine();
         int playersNumber;
         while (true) {
             System.out.println("Enter number of players");
             playersNumber = scanner.nextInt();
             scanner.nextLine();
-            if (playersNumber < 2) {
-                System.out.println("The game must have at least two players, enter another number");
+            if (playersNumber < 2 && 5 < playersNumber) {
+                System.out.println("The game must have at least two players and at most five players, enter another number");
                 continue;
             }
             break;
         }
-        Board board = new Board(playersNumber);
+
         // if player turnID changes , no problem will happen , but it had to be a number between 1 to playersNumber
         // in other word when a player's turn Id is 1 it does not mean he is the first player to start as said before
-
-        players.add(new Human(humanName, 1));
+        Board board = new Board(playersNumber, players);
+        players.add(new Human("Player1", 1));
         for (int i = 2; i <= playersNumber; i++) {
-            players.add(new Computer("BOT " + (i - 1), i));
+            players.add(new Computer("  BOT " + (i - 1), i));
         }
+
         while (true) {
             int[] turns = Board.getTurns();
             for (int i = 0; i < turns.length; i++) {
                 System.out.println("The game wise is : " + Board.getWise());
 
-                for (int j = 0; j < turns.length; j++) {
-                    Player playerToPrint = whosTurn(turns, j, players);
-                    System.out.println((j+1)+". "+playerToPrint.PlayerName + " has " + playerToPrint.playerCard.size() + " cards");
-                }
-                board.printLastPlayedCard();
+                board.printBoard();
+                //board.printLastPlayedCard();
                 //sleeping for 5 seconds to see what the bots are doing
 
                 try {
@@ -87,6 +85,7 @@ public class Game {
                     System.out.println();
                 }
                 Player playerToPlay = whosTurn(turns, i, players);
+                System.out.println(playerToPlay.PlayerName+"\'s turn");
                 playerToPlay.chooseCard();
                 if (playerToPlay.playerCard.size() == 0) {
                     System.out.println("This game is finished!");
@@ -110,29 +109,24 @@ public class Game {
             playersNumber = scanner.nextInt();
             scanner.nextLine();
             if (playersNumber < 2) {
-                System.out.println("The game must have at least two players, enter another number");
+                System.out.println("The game must have at least two players and at most five players, enter another number");
                 continue;
             }
             break;
         }
-        Board board = new Board(playersNumber);
+        Board board = new Board(playersNumber, players);
         // if player turnID changes , no problem will happen , but it had to be a number between 1 to playersNumber
         // in other word when a player's turn Id is 1 it does not mean he is the first player to start as said before
         for (int i = 1; i <= playersNumber; i++) {
-            System.out.println("Enter player " + i + " name");
-            String humanName = scanner.nextLine();
-            players.add(new Human(humanName, i));
+                players.add(new Human("Player"+i, i));
         }
         while (true) {
             int[] turns = Board.getTurns();
             for (int i = 0; i < turns.length; i++) {
                 System.out.println("The game wise is : " + Board.getWise());
-                for (int j = 0; j < turns.length; j++) {
-                    Player playerToPrint = whosTurn(turns, j, players);
-                    System.out.println((j+1)+". "+playerToPrint.PlayerName + " has " + playerToPrint.playerCard.size() + " cards");
-                }
-                board.printLastPlayedCard();
+                board.printBoard();
                 Player playerToPlay = whosTurn(turns, i, players);
+                System.out.println(playerToPlay.PlayerName+"\'s turn");
                 playerToPlay.chooseCard();
                 if (playerToPlay.playerCard.size() == 0) {
                     System.out.println("This game is finished!");
@@ -146,6 +140,7 @@ public class Game {
 
     /**
      * the main method :)
+     *
      * @param args
      */
     public static void main(String[] args) {

@@ -1,3 +1,5 @@
+import javafx.print.PageLayout;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -13,9 +15,11 @@ public class Board {
     //the turns array tells us which player's turn is , we give the turn to the players by this array.
     // in this array the value of each index is the player turn ID which is unique to each player and explained in it's place
     static private int[] turns;
+    // because the turns array changes in the game if the reverse card is played , we save the first amounts of this array in the firstTurns array
+    static private int[] firstTurns;
 
     static private Random random = new Random();
-
+    private ArrayList<Player> players;
     static private Card lastPlayedCard;
     static private String currentColor;
     static private int playersNumber;
@@ -23,9 +27,11 @@ public class Board {
     //1 for clockwise and -1 for anti clockWise
     static private int wise = 1;
 
-    public Board(int playersNumber) {
+    public Board(int playersNumber, ArrayList<Player> players) {
         this.playersNumber = playersNumber;
         turns = new int[playersNumber];
+        this.players = players;
+        firstTurns = new int[playersNumber];
 
         // initializing turns array randomly with different amounts
         int size = playersNumber;
@@ -36,6 +42,7 @@ public class Board {
         for (int i = 0; i < turns.length; i++) {
             int index = random.nextInt(list.size());
             turns[i] = list.get(index);
+            firstTurns[i] = list.get(index);
             list.remove(index);
         }
 
@@ -115,6 +122,7 @@ public class Board {
 
     /**
      * set the last played card
+     *
      * @param lastPlayedCard the last played card
      */
     public static void setLastPlayedCard(Card lastPlayedCard) {
@@ -123,21 +131,26 @@ public class Board {
 
     /**
      * get the last player card
+     *
      * @return the last player card
      */
     public static Card getLastPlayedCard() {
         return lastPlayedCard;
     }
+
     /**
      * set the color of the board
+     *
      * @param currentColor new color to be set
      */
     public static void setCurrentColor(String currentColor) {
         Board.currentColor = currentColor;
     }
+
     /**
      * get the color of the board
-     * @return  currentColor new color to be set
+     *
+     * @return currentColor new color to be set
      */
     public static String getCurrentColor() {
         return currentColor;
@@ -145,6 +158,7 @@ public class Board {
 
     /**
      * get the cards list
+     *
      * @return cards list
      */
     public static ArrayList<ArrayList<Card>> getCards() {
@@ -153,6 +167,7 @@ public class Board {
 
     /**
      * get the turns
+     *
      * @return turns array
      */
     public static int[] getTurns() {
@@ -161,6 +176,7 @@ public class Board {
 
     /**
      * reverse the board according to the player
+     *
      * @param turnIDOfCurrentPlayer turnID of player
      */
     public static void reverse(int turnIDOfCurrentPlayer) {
@@ -188,7 +204,8 @@ public class Board {
             int playerIndex = 0;
             for (int i = 0; i < turns.length; i++) {
                 if (turns[i] == turnIDOfCurrentPlayer) {
-                    playerIndex = i;;
+                    playerIndex = i;
+                    ;
                     break;
                 }
             }
@@ -207,14 +224,15 @@ public class Board {
 
     /**
      * add some cards to player deck
+     *
      * @param turnIDOfCurrentPlayer the turnID of the player
-     * @param cardsNumber how many cards should be add
+     * @param cardsNumber           how many cards should be add
      */
     public static void addCardToDeck(int turnIDOfCurrentPlayer, int cardsNumber) {
-        if(cardsNumber > cards.get(0).size()){
+        if (cardsNumber > cards.get(0).size()) {
             cardsNumber = cards.get(0).size();
             System.out.println("Not enough cards to add");
-            System.out.println("The player will take "+cardsNumber+" cards");
+            System.out.println("The player will take " + cardsNumber + " cards");
         }
         for (int i = 0; i < cardsNumber; i++) {
             int cardToAddIndex = random.nextInt(cards.get(0).size());
@@ -225,9 +243,9 @@ public class Board {
     }
 
     /**
-     * print the las card that played
+     * change the last played card to string
      */
-    public void printLastPlayedCard() {
+    public String lastPlayedCardToString() {
         String ANSI_COLOR;
         if (currentColor.equals(Constants.colors[0]))
             ANSI_COLOR = Constants.ANSI_COLORS[0];
@@ -238,25 +256,19 @@ public class Board {
         else if (currentColor.equals(Constants.colors[3]))
             ANSI_COLOR = Constants.ANSI_COLORS[3];
         else ANSI_COLOR = "0";
-
-        System.out.println(ANSI_COLOR + "------------------  ");
-        System.out.println("+                +  ");
-        System.out.println("|LAST PLAYED CARD|  ");
-        System.out.println("+                +  ");
-        System.out.println("------------------  ");
-        System.out.println("+                +  ");
-        System.out.println("|                |  ");
-        System.out.println("+                +  ");
-        System.out.println("|    " + lastPlayedCard.getTypeDetail() + "   |  ");
-        System.out.println("+                +  ");
-        System.out.println("|                |  ");
-        System.out.println("+                +  ");
-        System.out.println("------------------  " + ANSI_COLOR);
-        System.out.println("\n" + "\u001B[0m");
+        return "" + ANSI_COLOR + "\n                                    " + "------------------  \n" +
+                "                                    " + "|LAST PLAYED CARD|  \n" +
+                "                                    " + "------------------  \n" +
+                "                                    " + "+                +  \n" +
+                "                                    " + "|    " + lastPlayedCard.getTypeDetail() + "   |  \n" +
+                "                                    " + "+                +  \n" +
+                "                                    " + "------------------  " + ANSI_COLOR
+                + "\u001B[0m";
     }
 
     /**
      * get the wise of the game
+     *
      * @return wise of the game
      */
     public static String getWise() {
@@ -264,4 +276,72 @@ public class Board {
             return "ClockWise";
         else return "Anti ClockWise";
     }
+
+    /**
+     * print the board contains players name , remaining cards of each and the card on the ground or the last played card
+     */
+    public void printBoard() {
+        Player player1 = Game.whosTurn(firstTurns, 0, players);
+        Player player2 = Game.whosTurn(firstTurns, 1, players);
+
+        String playersStatus =
+                "<><><><><><><><>" + "                                                         " + "<><><><><><><><>\n" +
+                        "#              #" + "                                                         " + "#              #\n" +
+                        "    "+player1.getPlayerName() + "                                                                  " + player2.getPlayerName() + "\n" +
+                        "    cards: " + player1.playerCard.size() + "                                                       " + "          cards: " + player2.playerCard.size() + "\n" +
+                        "#              #" + "                                                         " + "#              #\n" +
+                        "<><><><><><><><>" + "                                                         " + "<><><><><><><><>";
+        if (playersNumber == 2) {
+            System.out.println(playersStatus + lastPlayedCardToString());
+            return;
+        }
+
+
+        if (playersNumber == 3) {
+            Player player3 = Game.whosTurn(firstTurns, 2, players);
+            System.out.println(playersStatus+lastPlayedCardToString());
+            System.out.print(
+                    "\n                                    " + "<><><><><><><><>\n" +
+                            "                                    " + "#              #\n" +
+                            "                                       " + player3.getPlayerName() + "\n" +
+                            "                                    " + "    cards: " + player3.playerCard.size() + "\n" +
+                            "                                    " + "#              #\n" +
+                            "                                    " + "<><><><><><><><>");
+            return;
+        }
+        if (playersNumber == 4) {
+            Player player3 = Game.whosTurn(firstTurns, 2, players);
+            Player player4 = Game.whosTurn(firstTurns, 3, players);
+            System.out.println(playersStatus+lastPlayedCardToString());
+            System.out.println(
+                    "<><><><><><><><>" + "                                                         " + "<><><><><><><><>\n" +
+                            "#              #" + "                                                         " + "#              #\n" +
+                            "   "+player4.getPlayerName() + "                                                                   " + player3.getPlayerName() + "\n" +
+                            "    cards: " + player4.playerCard.size() + "                                                       " + "          cards: " + player3.playerCard.size() + "\n" +
+                            "#              #" + "                                                         " + "#              #\n" +
+                            "<><><><><><><><>" + "                                                         " + "<><><><><><><><>");
+            return;
+        }
+        if (playersNumber == 5) {
+            Player player3 = Game.whosTurn(firstTurns, 2, players);
+            Player player4 = Game.whosTurn(firstTurns, 3, players);
+            Player player5 = Game.whosTurn(firstTurns, 4, players);
+            System.out.println(playersStatus+lastPlayedCardToString());
+            System.out.println(
+                    "<><><><><><><><>" + "                                                         " + "<><><><><><><><>\n" +
+                    "#              #" + "                                                         " + "#              #\n" +
+                    "   "+player5.getPlayerName() + "                                                                   " + player3.getPlayerName() + "\n" +
+                    "    cards: " + player5.playerCard.size() + "                                                       " + "          cards: " + player3.playerCard.size() + "\n" +
+                    "#              #" + "                                                         " + "#              #\n" +
+                    "<><><><><><><><>" + "                                                         " + "<><><><><><><><>\n\n" +
+                    "                                    " + "<><><><><><><><>\n" +
+                    "                                    " + "#              #\n" +
+                    "                                       " + player4.getPlayerName() +"\n"+
+                    "                                    " + "    cards: " + player4.playerCard.size() + "\n" +
+                    "                                    " + "#              #\n" +
+                    "                                    " + "<><><><><><><><>\n");
+            return;
+        }
+    }
+
 }
